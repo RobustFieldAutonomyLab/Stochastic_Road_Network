@@ -1,0 +1,22 @@
+{
+  "base":{
+    "seed": [0,1,2,3,4],
+    "eval_freq": 10000,
+    "num_timesteps": 1000000
+  },
+  "agent":{
+    "name": "A2C",
+    "discount": 0.99,
+    "alpha": [1e-06,5e-06,1e-05,5e-05,1e-04,5e-04,1e-03],
+    "buffer_size": 64
+  },
+  "environment":{
+    "map_name": "Town01",
+    "data_dir": "carla_data",
+    "start_state": 209,
+    "goal_states": [112, 113],
+    "crosswalk_states":[261]
+  },
+  "policy": "CnnPolicy",
+  "save_dir": "Baselines"
+}

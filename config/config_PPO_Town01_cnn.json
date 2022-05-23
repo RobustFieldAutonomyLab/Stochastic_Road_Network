@@ -1,0 +1,24 @@
+{
+  "base":{
+    "seed": [0,1,2,3,4],
+    "eval_freq": 10000,
+    "num_timesteps": 1000000
+  },
+  "agent":{
+    "name": "PPO",
+    "discount": 0.99,
+    "alpha": [5e-06,1e-05,5e-05,1e-04,5e-04,1e-03],
+    "buffer_size": 2048,
+    "batch_size": 64,
+    "n_epochs":10
+  },
+  "environment":{
+    "map_name": "Town01",
+    "data_dir": "carla_data",
+    "start_state": 209,
+    "goal_states": [112, 113],
+    "crosswalk_states": [261]
+  },
+  "policy": "CnnPolicy",
+  "save_dir": "Baselines"
+}
