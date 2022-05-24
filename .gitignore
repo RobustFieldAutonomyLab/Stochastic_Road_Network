@@ -2,3 +2,4 @@ carla_data
 Baselines
 carle_gym/carle.egg-info
 __pycache__
+config

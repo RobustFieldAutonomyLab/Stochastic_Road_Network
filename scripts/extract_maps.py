@@ -472,7 +472,7 @@ if __name__ == "__main__":
 
     # Initialize topology dict
 
-    data_dir = Path("../data/carla_data")
+    data_dir = Path("../carla_data")
     target_maps = client.get_available_maps()
     
     for map_id in target_maps:
