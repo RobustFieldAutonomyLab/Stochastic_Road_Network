@@ -35,7 +35,7 @@ sudo apt install libpng16-16 libjpeg8 libtiff5
 ## Usage
 1. Run the Docker script (initializes headless CARLA server under Docker)
 ```
-sudo ./carla_docker.sh -oe
+sudo scripts/carla_docker.sh -oe
 ```
 
 2. Run the data generation script:
