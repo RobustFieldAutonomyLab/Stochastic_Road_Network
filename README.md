@@ -22,13 +22,7 @@ git clone git@github.com:RobustFieldAutonomyLab/Stochastic_Road_Network.git
 cd Stochastic_Road_Network
 ```
 
-3. Enter the repo root folder and install the packages:
-```
-$ pip install -r requirements.txt
-$ pip install -e .
-```
-
-4. Install relevant system dependencies for CARLA Python Library:
+3. Install relevant system dependencies for CARLA Python Library:
 ```
 sudo apt install libpng16-16 libjpeg8 libtiff5
 ```
@@ -46,7 +40,7 @@ $ python scripts/extract_maps.py
 
 3. Run the main experiment script:
 ```
-$ python run_stable_baselines3.py
+$ python run_stable_baselines3.py -C [experiment config file (required)] -P [number of processes (optional)] -D [cuda device (optional)]
 ```
 
 ## Experiment Parameterization
