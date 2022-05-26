@@ -1,5 +1,5 @@
 ## The Stochastic Road Network Environment
-The Stochastic Road Network Environment is built upon map structure and simulated sensor data originating from the CARLA autonomous vehicle simulator version 0.9.6. Five such maps are available by default, named in the sequencing of Town01 to Town05. The graph topology structure of Town01 and an example observation provided to the learning system are shown as follows. For detailed information about the Stochastic Road Network Environment, please refer to our paper (https://drive.google.com/file/d/1U7gUpJbZDRAC54xNhrOOEXYhLsU4HjLF/view).
+The Stochastic Road Network Environment is built upon map structure and simulated sensor data originating from the CARLA autonomous vehicle simulator version 0.9.6. Five such maps are available by default, named in the sequencing of Town01 to Town05. The graph topology structure of Town01 and an example observation provided to the learning system are shown as follows. For detailed information about the Stochastic Road Network Environment, please refer to our paper [here](https://drive.google.com/file/d/1U7gUpJbZDRAC54xNhrOOEXYhLsU4HjLF/view).
 
 ![image](https://github.com/RobustFieldAutonomyLab/Stochastic_Road_Network/blob/main/observation.png)
 
