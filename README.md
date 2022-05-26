@@ -3,10 +3,12 @@ The Stochastic Road Network Environment is built upon map structure and simulate
 
 ![image](https://github.com/RobustFieldAutonomyLab/Stochastic_Road_Network/blob/main/observation.png)
 
-## System Requirements
+## System Requirement
 -  Ubuntu 20.04
 
-## Installation
+## Map Data Generation
+The map data needed to run experiments on Town01 to Town05 could be downloaded from [here](https://drive.google.com/drive/folders/1TUSrMJdmbPkWzNTtI7uGLuYmLut-mg3L?usp=sharing), or you could go through the following process to generate data with the provided scripts.
+
 1. Install [NVIDIA Container Runtime](https://nvidia.github.io/nvidia-container-runtime/)
 ```
 curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
@@ -32,17 +34,17 @@ cd Stochastic_Road_Network
 sudo apt install libpng16-16 libjpeg8 libtiff5
 ```
 
-## Usage
-1. Run the Docker script (initializes headless CARLA server under Docker)
+4. Run the Docker script (initializes headless CARLA server under Docker)
 ```
 sudo scripts/carla_docker.sh -oe
 ```
 
-2. Run the data generation script:
+5. Run the data generation script:
 ```
-$ python scripts/extract_maps.py
+python scripts/extract_maps.py
 ```
 
+## Run an Experiment
 3. Run the main experiment script:
 ```
 $ python run_stable_baselines3.py -C [experiment config file (required)] -P [number of processes (optional)] -D [cuda device (optional)]
