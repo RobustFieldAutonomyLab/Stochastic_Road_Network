@@ -15,7 +15,10 @@ class CarleEnv(gym.Env):
         reset_state: int,
         discount: float,
         crosswalk_states: Sequence[int],
-        agent: str
+        agent: str,
+        network: str,
+        r_base: float,
+        r_loopback: float
     ):
         # PRNG for random rewards.
         self._rand = np.random.RandomState(seed)
@@ -52,9 +55,15 @@ class CarleEnv(gym.Env):
         )
 
         # Define action space and observation space
+        self.network = network
         self.action_space = gym.spaces.Discrete(np.shape(self.transition_matrix)[1])
-        self.observation_shape = (1,255,255)
-        self.observation_space = gym.spaces.Box(np.zeros(self.observation_shape),np.ones(self.observation_shape),dtype=np.float32)
+        if self.network == "MlpPolicy":
+            self.observation_space = gym.spaces.Box(np.zeros((255*255,)),np.ones((255*255,)),dtype=np.float32)
+        elif self.network == "CnnPolicy":
+            self.observation_shape = (1,255,255)
+            self.observation_space = gym.spaces.Box(np.zeros(self.observation_shape),np.ones(self.observation_shape),dtype=np.float32)
+        else:
+            raise RuntimeError("The network strucutre is not available")
 
         # Initialize transition counter
         self.transition_counts = np.zeros_like(self.transition_matrix)
@@ -63,7 +72,9 @@ class CarleEnv(gym.Env):
         self.discount = discount
 
         # Set rewards values
-        self.rewards = -3 * np.ones(len(self.transition_matrix))
+        self.r_base = r_base
+        self.r_loopback = r_loopback
+        self.rewards = -self.r_base * np.ones(len(self.transition_matrix))
         self.rewards[np.array(goal_states)] = 0
     
     def step(self, action: int) -> Tuple[np.ndarray, float, bool, dict]:
@@ -96,8 +107,12 @@ class CarleEnv(gym.Env):
         """Returns the observation image (ground) for a given state."""
         scans = np.reshape(self.observations[state],(255,255,2))
         ground = scans[:,:,1]
-        #return np.array(ground.flatten())
-        return np.array([ground])
+        if self.network == "MlpPolicy":
+            return np.array(ground.flatten())
+        elif self.network == "CnnPolicy":
+            return np.array([ground])
+        else:
+            raise RuntimeError("The network strucutre is not available")
 
     def get_obs(self) -> np.ndarray:
         """Returns the observation image (ground) for the current state."""
@@ -120,16 +135,17 @@ class CarleEnv(gym.Env):
         """Returns the reward for reaching the current state."""
         # Penalize the self-transition action
         if self.prev_state == self.state:
-            return self.rewards[self.state] - ssd_thres - 3
+        #    return self.rewards[self.state] - ssd_thres - 3
+            return self.rewards[self.state] - self.r_loopback
 
         # Add noise at the simulated cross walks.
         if self.state in self.crosswalk_states:
             # Use vonmises distribution as stand-in for wrapped gaussian
-            #  - Interval is bounded from -2 to 0 with below parameters
+            #  - Interval is bounded from -2*r_base to 0 with below parameters
             #  - kappa parameter is inversely proportional to variance
             #  - see:
             #     https://numpy.org/devdocs/reference/random/generated/numpy.random.vonmises.html
-            return 3*(self._rand.vonmises(mu=0, kappa=1) / np.pi) - 3
+            return self.r_base*(self._rand.vonmises(mu=0, kappa=1) / np.pi) - self.r_base
 
         # Deterministic traffic penalty otherwise.
         return self.rewards[self.state]

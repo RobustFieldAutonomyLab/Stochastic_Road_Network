@@ -79,6 +79,19 @@ def params_dashboard(params):
     print("crosswalk_states: ",params["environment"]["crosswalk_states"],"\n")
 
 def run_trial(params,device):
+
+    #print("\n====== Trial Setup ======\n")
+    #print("seed: ",params["base"]["seed"])
+    #print("num_timesteps: ",params["base"]["num_timesteps"])
+    #print("agent: ",params["agent"]["name"])
+    #print("policy: ",params["policy"])
+    #print("discount: ",params["agent"]["discount"])
+    #print("learning rate: ",params["agent"]["alpha"])
+    #print("map: ",params["environment"]["map_name"])
+    #print("start_state: ",params["environment"]["start_state"])
+    #print("goal_states: ",params["environment"]["goal_states"])
+    #print("crosswalk_states: ",params["environment"]["crosswalk_states"],"\n")
+
     lr = params["agent"]["alpha"]
     sd = params["base"]["seed"]
     cw = params["environment"]["crosswalk_states"]
@@ -93,7 +106,10 @@ def run_trial(params,device):
                     reset_state=params["environment"]["start_state"],
                     discount=params["agent"]["discount"],
                     crosswalk_states=cw,
-                    agent=params["agent"]["name"])
+                    agent=params["agent"]["name"],
+                    network=params["policy"],
+                    r_base=params["environment"]["r_base"],
+                    r_loopback=params["environment"]["r_loopback"])
 
     print("creating evaluation env")
     evaluate_env = gym.make("carle_gym:carle-v0",
@@ -104,7 +120,10 @@ def run_trial(params,device):
                     reset_state=params["environment"]["start_state"],
                     discount=params["agent"]["discount"],
                     crosswalk_states=cw,
-                    agent=params["agent"]["name"])
+                    agent=params["agent"]["name"],
+                    network=params["policy"],
+                    r_base=params["environment"]["r_base"],
+                    r_loopback=params["environment"]["r_loopback"])
 
     behave_env.reset()
     evaluate_env.reset()
@@ -118,12 +137,19 @@ def run_trial(params,device):
     param_file = os.path.join(save_dir,"trial_config.json")
     with open(param_file, 'w+') as outfile:
         json.dump(params, outfile)
+    
+    if params["policy"] == "MlpPolicy":
+        policy_args = {}
+    elif params["policy"] == "CnnPolicy":
+        policy_args = {"normalize_images":False}
+    else:
+        raise RuntimeError("The network strucutre is not available")
+
     if params["agent"]["name"] == "PPO":
-        PPO_policy_kwargs = {"normalize_images":False}
         model = PPO(params["policy"], 
                     behave_env, 
                     verbose=1,
-                    policy_kwargs=PPO_policy_kwargs,
+                    policy_kwargs=policy_args,
                     learning_rate=lr, 
                     seed=sd, 
                     n_steps=params["agent"]["buffer_size"], 
@@ -132,22 +158,20 @@ def run_trial(params,device):
                     gamma=params["agent"]["discount"],
                     device=device)
     elif params["agent"]["name"] == "A2C":
-        A2C_policy_kwargs = {"normalize_images":False}
         model = A2C(params["policy"], 
                     behave_env, 
                     verbose=1, 
-                    policy_kwargs=A2C_policy_kwargs,
+                    policy_kwargs=policy_args,
                     learning_rate=lr, 
                     seed=sd, 
                     n_steps=params["agent"]["buffer_size"], 
                     gamma=params["agent"]["discount"],
                     device=device)
     elif params["agent"]["name"] == "DQN":
-        DQN_policy_kwargs = {"normalize_images":False}
         model = DQN(params["policy"], 
                     behave_env, 
                     verbose=1,
-                    policy_kwargs=DQN_policy_kwargs,
+                    policy_kwargs=policy_args,
                     learning_rate=lr, 
                     exploration_fraction=params["agent"]["eps_fraction"],
                     exploration_final_eps=params["agent"]["epsilon"],
@@ -158,12 +182,11 @@ def run_trial(params,device):
                     gamma=params["agent"]["discount"],
                     device=device)
     elif params["agent"]["name"] == "QRDQN":
-        QRDQN_policy_kwargs = {"n_quantiles":params["agent"]["n_quantiles"],
-                               "normalize_images":False}
+        policy_args["n_quantiles"] = params["agent"]["n_quantiles"]
         model = QRDQN(params["policy"],
                       behave_env, 
                       verbose=1,
-                      policy_kwargs=QRDQN_policy_kwargs,
+                      policy_kwargs=policy_args,
                       learning_rate=lr,
                       exploration_fraction=params["agent"]["eps_fraction"],
                       exploration_final_eps=params["agent"]["epsilon"],
@@ -178,6 +201,11 @@ def run_trial(params,device):
     
     model.learn(total_timesteps=params["base"]["num_timesteps"], eval_env=evaluate_env, eval_freq=params["base"]["eval_freq"], n_eval_episodes=1, eval_log_path=save_dir)
     
+    # check number of steps since last reset of env
+    #behave_count = behave_env._get_count()
+    #evaluate_count = evaluate_env._get_count()
+    #count_file = os.path.join(save_dir,"count.txt")
+    #np.savetxt(count_file,[behave_count,evaluate_count],fmt="%d")
 
     # save all paths in evaluation
     all_eval_paths = evaluate_env.get_all_paths()
