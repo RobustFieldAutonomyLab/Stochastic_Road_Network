@@ -350,6 +350,9 @@ class BaseAlgorithm(ABC):
         eval_freq: int = 10000,
         n_eval_episodes: int = 5,
         log_path: Optional[str] = None,
+        ##### local modification #####
+        eval_policy: str = "Greedy",
+        ssd_thres: float = 1e-03
     ) -> BaseCallback:
         """
         :param callback: Callback(s) called at every step with state of the algorithm.
@@ -375,6 +378,9 @@ class BaseAlgorithm(ABC):
                 log_path=log_path,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
+                ##### local modification #####
+                eval_policy=eval_policy,
+                ssd_thres=ssd_thres
             )
             callback = CallbackList([callback, eval_callback])
 
@@ -391,6 +397,9 @@ class BaseAlgorithm(ABC):
         log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
         tb_log_name: str = "run",
+        ##### local modification #####
+        eval_policy: str = "Greedy",
+        ssd_thres: float = 1e-03
     ) -> Tuple[int, BaseCallback]:
         """
         Initialize different variables needed for training.
@@ -442,7 +451,8 @@ class BaseAlgorithm(ABC):
             self._logger = utils.configure_logger(self.verbose, self.tensorboard_log, tb_log_name, reset_num_timesteps)
 
         # Create eval callback if needed
-        callback = self._init_callback(callback, eval_env, eval_freq, n_eval_episodes, log_path)
+        ##### local modification #####
+        callback = self._init_callback(callback, eval_env, eval_freq, n_eval_episodes, log_path, eval_policy, ssd_thres)
 
         return total_timesteps, callback
 

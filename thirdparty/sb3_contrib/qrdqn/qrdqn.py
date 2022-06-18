@@ -250,6 +250,9 @@ class QRDQN(OffPolicyAlgorithm):
         tb_log_name: str = "QRDQN",
         eval_log_path: Optional[str] = None,
         reset_num_timesteps: bool = True,
+        ##### local modification #####
+        eval_policy: str = "Greedy",
+        ssd_thres: float = 1e-03
     ) -> OffPolicyAlgorithm:
 
         return super(QRDQN, self).learn(
@@ -262,6 +265,9 @@ class QRDQN(OffPolicyAlgorithm):
             tb_log_name=tb_log_name,
             eval_log_path=eval_log_path,
             reset_num_timesteps=reset_num_timesteps,
+            ##### local modification #####
+            eval_policy=eval_policy,
+            ssd_thres=ssd_thres
         )
 
     def _excluded_save_params(self) -> List[str]:

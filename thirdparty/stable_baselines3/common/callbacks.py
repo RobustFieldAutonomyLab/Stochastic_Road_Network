@@ -304,6 +304,9 @@ class EvalCallback(EventCallback):
         render: bool = False,
         verbose: int = 1,
         warn: bool = True,
+        ##### local modification #####
+        eval_policy: str = "Greedy",
+        ssd_thres: float = 1e-03
     ):
         super(EvalCallback, self).__init__(callback_on_new_best, verbose=verbose)
         self.n_eval_episodes = n_eval_episodes
@@ -313,6 +316,9 @@ class EvalCallback(EventCallback):
         self.deterministic = deterministic
         self.render = render
         self.warn = warn
+        ##### local modification #####
+        self.eval_policy = eval_policy
+        self.ssd_thres = ssd_thres
 
         # Convert to VecEnv for consistency
         if not isinstance(eval_env, VecEnv):
@@ -384,6 +390,9 @@ class EvalCallback(EventCallback):
                 return_episode_rewards=True,
                 warn=self.warn,
                 callback=self._log_success_callback,
+                ##### local modification #####
+                eval_policy=self.eval_policy,
+                ssd_thres=self.ssd_thres
             )
 
             if self.log_path is not None:
@@ -408,6 +417,11 @@ class EvalCallback(EventCallback):
             mean_reward, std_reward = np.mean(episode_rewards), np.std(episode_rewards)
             mean_ep_length, std_ep_length = np.mean(episode_lengths), np.std(episode_lengths)
             self.last_mean_reward = mean_reward
+            
+            if self.eval_policy == "Thresholded_SSD":
+                print("Eval policy: Thresholded SSD, ",f"Mean threshold: {self.ssd_thres:.1f}")
+            else:
+                print("Eval policy: ",self.eval_policy)
 
             if self.verbose > 0:
                 print(f"Eval num_timesteps={self.num_timesteps}, " f"episode_reward={mean_reward:.2f} +/- {std_reward:.2f}")

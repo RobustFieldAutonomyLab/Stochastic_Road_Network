@@ -70,27 +70,20 @@ def params_dashboard(params):
     print("seed: ",params["base"]["seed"])
     print("num_timesteps: ",params["base"]["num_timesteps"])
     print("agent: ",params["agent"]["name"])
-    print("policy: ",params["policy"])
+    print("network: ",params["policy"])
     print("discount: ",params["agent"]["discount"])
     print("learning rate: ",params["agent"]["alpha"])
     print("map: ",params["environment"]["map_name"])
     print("start_state: ",params["environment"]["start_state"])
     print("goal_states: ",params["environment"]["goal_states"])
-    print("crosswalk_states: ",params["environment"]["crosswalk_states"],"\n")
+    print("crosswalk_states: ",params["environment"]["crosswalk_states"])
+    if params["agent"]["name"] == "QRDQN":
+        print("eval policy: ",params["agent"]["eval_policy"])
+        if params["agent"]["eval_policy"] == "Thresholded_SSD":
+            print("ssd thres: ",params["agent"]["ssd_thres"])
+    print("\n")
 
 def run_trial(params,device):
-
-    #print("\n====== Trial Setup ======\n")
-    #print("seed: ",params["base"]["seed"])
-    #print("num_timesteps: ",params["base"]["num_timesteps"])
-    #print("agent: ",params["agent"]["name"])
-    #print("policy: ",params["policy"])
-    #print("discount: ",params["agent"]["discount"])
-    #print("learning rate: ",params["agent"]["alpha"])
-    #print("map: ",params["environment"]["map_name"])
-    #print("start_state: ",params["environment"]["start_state"])
-    #print("goal_states: ",params["environment"]["goal_states"])
-    #print("crosswalk_states: ",params["environment"]["crosswalk_states"],"\n")
 
     lr = params["agent"]["alpha"]
     sd = params["base"]["seed"]
@@ -129,7 +122,7 @@ def run_trial(params,device):
     evaluate_env.reset()
     
     if params["agent"]["name"] == "QRDQN":
-        save_dir = os.path.join(params["save_dir"],params["agent"]["name"],params["environment"]["map_name"],params["policy"],stoc,"buffer_"+str(params["agent"]["buffer_size"]),"n_quantile_"+str(params["agent"]["n_quantiles"]),"lr_"+str(lr),"seed_"+str(sd))
+        save_dir = os.path.join(params["save_dir"],params["agent"]["name"],params["environment"]["map_name"],params["policy"],params["agent"]["eval_policy"],stoc,"buffer_"+str(params["agent"]["buffer_size"]),"n_quantile_"+str(params["agent"]["n_quantiles"]),"lr_"+str(lr),"seed_"+str(sd))
     else:
         save_dir = os.path.join(params["save_dir"],params["agent"]["name"],params["environment"]["map_name"],params["policy"],stoc,"buffer_"+str(params["agent"]["buffer_size"]),"lr_"+str(lr),"seed_"+str(sd)) 
 
@@ -144,7 +137,8 @@ def run_trial(params,device):
         policy_args = {"normalize_images":False}
     else:
         raise RuntimeError("The network strucutre is not available")
-
+    
+    eval_args = {}
     if params["agent"]["name"] == "PPO":
         model = PPO(params["policy"], 
                     behave_env, 
@@ -183,6 +177,9 @@ def run_trial(params,device):
                     device=device)
     elif params["agent"]["name"] == "QRDQN":
         policy_args["n_quantiles"] = params["agent"]["n_quantiles"]
+        eval_args["eval_policy"] = params["agent"]["eval_policy"]
+        if params["agent"]["eval_policy"] == "Thresholded_SSD":
+            eval_args["ssd_thres"] = params["agent"]["ssd_thres"]
         model = QRDQN(params["policy"],
                       behave_env, 
                       verbose=1,
@@ -198,23 +195,17 @@ def run_trial(params,device):
                       device=device)
     else:
         raise RuntimeError("The agent is not available.")
-    
-    model.learn(total_timesteps=params["base"]["num_timesteps"], eval_env=evaluate_env, eval_freq=params["base"]["eval_freq"], n_eval_episodes=1, eval_log_path=save_dir)
-    
-    # check number of steps since last reset of env
-    #behave_count = behave_env._get_count()
-    #evaluate_count = evaluate_env._get_count()
-    #count_file = os.path.join(save_dir,"count.txt")
-    #np.savetxt(count_file,[behave_count,evaluate_count],fmt="%d")
 
-    # save all paths in evaluation
+    model.learn(total_timesteps=params["base"]["num_timesteps"], eval_env=evaluate_env, eval_freq=params["base"]["eval_freq"], n_eval_episodes=1, eval_log_path=save_dir, **eval_args)
+
+    # save all paths in evaluations
     all_eval_paths = evaluate_env.get_all_paths()
     paths_file = os.path.join(save_dir,"eval_paths.csv")
     with open(paths_file, "w", newline="") as f:
         write = csv.writer(f)
         write.writerows(all_eval_paths)
 
-    # save all quantiles in evalution (for QR-DQN agent)
+    # save all quantiles in evalutions (for QR-DQN agent)
     if params["agent"]["name"] == "QRDQN":
         all_eval_q = evaluate_env.get_quantiles()
         np.save(os.path.join(save_dir,"eval_quantiles.npy"),all_eval_q)

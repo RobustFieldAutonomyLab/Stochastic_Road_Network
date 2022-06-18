@@ -7,6 +7,24 @@ import numpy as np
 from stable_baselines3.common import base_class
 from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, VecMonitor, is_vecenv_wrapped
 
+##### local modification #####
+def ssd_policy(quantiles:np.ndarray, use_threshold:bool=False, mean_threshold:float=1e-03):
+    means = np.mean(quantiles,axis=0)
+    sort_idx = np.argsort(-1*means)
+    best_1 = sort_idx[0]
+    best_2 = sort_idx[1]
+    if means[best_1] - means[best_2] > mean_threshold:
+        return best_1
+    else:
+        if use_threshold:
+            signed_second_moment = -1 * np.var(quantiles,axis=0)
+        else:
+            signed_second_moment = -1 * np.mean(quantiles**2,axis=0)
+        action = best_1
+        if signed_second_moment[best_2] > signed_second_moment[best_1]:
+            action = best_2
+        return action
+
 
 def evaluate_policy(
     model: "base_class.BaseAlgorithm",
@@ -18,6 +36,9 @@ def evaluate_policy(
     reward_threshold: Optional[float] = None,
     return_episode_rewards: bool = False,
     warn: bool = True,
+    ##### local modification #####
+    eval_policy: str = "Greedy",
+    ssd_thres: float = 1e-03
 ) -> Union[Tuple[float, float], Tuple[List[float], List[int]]]:
     """
     Runs policy for ``n_eval_episodes`` episodes and returns average reward.
@@ -70,9 +91,9 @@ def evaluate_policy(
         )
     
     ##### local modification #####
-    # get quantiles prediction for all state action pair if the agent is QR-DQN
+    # store quantiles prediction for all state action pair if the agent is QR-DQN
     if env.save_q_vals:
-        print("predicting quantiles (QR-DQN)")
+        print("saving quantiles (QR-DQN)")
         all_quantiles = []
         for i in range(env.num_states):
             obs = env.get_obs_at_state(i)
@@ -94,7 +115,21 @@ def evaluate_policy(
     observations = env.reset()
     states = None
     while (episode_counts < episode_count_targets).any():
-        actions, states = model.predict(observations, state=states, deterministic=deterministic)
+        ##### local modification #####
+        if eval_policy == "Greedy":
+            actions, states = model.predict(observations, state=states, deterministic=deterministic)
+        # TODO: consider multi environments case
+        elif eval_policy == "SSD":
+            q_vals = model.predict_quantiles(observations)
+            actions = np.array([ssd_policy(q_vals.cpu().data.numpy()[0])])
+            states = None
+        elif eval_policy == "Thresholded_SSD":
+            q_vals = model.predict_quantiles(observations)
+            actions = np.array([ssd_policy(q_vals.cpu().data.numpy()[0],use_threshold=True,mean_threshold=ssd_thres)])
+            states = None
+        else:
+            raise RuntimeError("The evaluation policy is not available.")
+        
         observations, rewards, dones, infos = env.step(actions)
         ##### local modification #####
         #current_rewards += rewards
