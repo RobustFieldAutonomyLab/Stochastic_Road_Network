@@ -1,0 +1,30 @@
+{
+  "base":{
+    "seed": [0],
+    "eval_freq": 10000,
+    "num_timesteps": 1000000
+  },
+  "agent":{
+    "name": "QRDQN",
+    "discount": 0.99,
+    "alpha": [5e-04],
+    "buffer_size": 2048,
+    "batch_size": 64,
+    "n_quantiles": 4,
+    "epsilon": 0.1,
+    "eps_fraction": 0.02,
+    "eval_policy": "Greedy"
+  },
+  "environment":{
+    "map_name": "Town01",
+    "data_dir": "carla_data",
+    "start_state": 209,
+    "goal_states": [112, 113],
+    "crosswalk_states": [261],
+    "r_base": 3,
+    "r_loopback": 18
+  },
+  "policy": "CnnPolicy",
+  "save_dir": "Baselines"
+}
+
