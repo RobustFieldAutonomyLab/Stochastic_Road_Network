@@ -45,7 +45,7 @@ python scripts/extract_maps.py
 ```
 
 ## Run an Experiment
-3. Run the main experiment script:
+Run the main experiment script:
 ```
 $ python run_stable_baselines3.py -C [experiment config file (required)] -P [number of processes (optional)] -D [cuda device (optional)]
 ```
