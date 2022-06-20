@@ -2,25 +2,29 @@
   "base":{
     "seed": [0],
     "eval_freq": 10000,
-    "num_timesteps": 1000000
+    "num_timesteps": 2000000
   },
   "agent":{
-    "name": "PPO",
+    "name": "QRDQN",
     "discount": 0.99,
-    "alpha": [2e-04],
+    "alpha": [5e-05],
     "buffer_size": 2048,
     "batch_size": 64,
-    "n_epochs":1
+    "n_quantiles": 4,
+    "epsilon": 0.1,
+    "eps_fraction": 0.02,
+    "eval_policy": "Greedy"
   },
   "environment":{
-    "map_name": "Town01",
+    "map_name": "Town03",
     "data_dir": "carla_data",
-    "start_state": 209,
-    "goal_states": [112, 113],
-    "crosswalk_states": [261],
+    "start_state": 546,
+    "goal_states": [641, 642],
+    "crosswalk_states": [585],
     "r_base": 1,
     "r_loopback": 0
   },
   "policy": "MlpPolicy",
   "save_dir": "Baselines"
 }
+

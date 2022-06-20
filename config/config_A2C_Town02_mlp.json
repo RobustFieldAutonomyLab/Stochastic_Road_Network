@@ -5,22 +5,20 @@
     "num_timesteps": 1000000
   },
   "agent":{
-    "name": "PPO",
+    "name": "A2C",
     "discount": 0.99,
-    "alpha": [2e-04],
-    "buffer_size": 2048,
-    "batch_size": 64,
-    "n_epochs":1
+    "alpha": [8e-05],
+    "buffer_size": 64
   },
   "environment":{
-    "map_name": "Town01",
+    "map_name": "Town02",
     "data_dir": "carla_data",
-    "start_state": 209,
-    "goal_states": [112, 113],
-    "crosswalk_states": [261],
-    "r_base": 1,
+    "start_state": 16,
+    "goal_states": [89,90],
+    "crosswalk_states": [96],
+    "r_base": 1, 
     "r_loopback": 0
   },
   "policy": "MlpPolicy",
   "save_dir": "Baselines"
-}
+} 

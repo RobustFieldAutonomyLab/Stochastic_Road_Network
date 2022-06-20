@@ -25,6 +25,6 @@
     "r_loopback": 18
   },
   "policy": "CnnPolicy",
-  "save_dir": "Baselines"
+  "save_dir": "/home/rfal/Stochastic_Road_Network/Baselines"
 }
 

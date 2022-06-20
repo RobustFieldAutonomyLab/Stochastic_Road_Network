@@ -2,7 +2,7 @@
   "base":{
     "seed": [0],
     "eval_freq": 10000,
-    "num_timesteps": 1000000
+    "num_timesteps": 2000000
   },
   "agent":{
     "name": "PPO",
@@ -13,11 +13,11 @@
     "n_epochs":1
   },
   "environment":{
-    "map_name": "Town01",
+    "map_name": "Town03",
     "data_dir": "carla_data",
-    "start_state": 209,
-    "goal_states": [112, 113],
-    "crosswalk_states": [261],
+    "start_state": 546,
+    "goal_states": [641, 642],
+    "crosswalk_states": [585],
     "r_base": 1,
     "r_loopback": 0
   },
