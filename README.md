@@ -7,7 +7,7 @@ The Stochastic Road Network Environment is built upon map structure and simulate
 -  Ubuntu 20.04
 
 ## Map Data Generation
-The map data needed to run experiments on Town01 to Town05 could be downloaded from [here](https://drive.google.com/drive/folders/1TUSrMJdmbPkWzNTtI7uGLuYmLut-mg3L?usp=sharing), or you could go through the following process to generate data with the provided scripts.
+The map data needed to run experiments on Town01 to Town05 could be downloaded from [here](https://stevens0-my.sharepoint.com/:f:/g/personal/xlin26_stevens_edu/EioIeHjcj_xNnJJc7ziMAUMBmz6fLFFxblYV2JWNHvAcyQ?e=R1UAjR), or you could go through the following process to generate data with the provided scripts.
 
 1. Install [NVIDIA Container Runtime](https://nvidia.github.io/nvidia-container-runtime/)
 ```
