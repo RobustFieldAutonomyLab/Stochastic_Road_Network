@@ -1,12 +1,21 @@
+# Distributional RL for Route Planning
+
+This repository provides the codes of our UR 2023 paper [here](https://arxiv.org/abs/2304.09996). We developed the Stochastic Road Network Environment based on the autonomous vehicle simulator [CARLA](https://github.com/carla-simulator/carla), and proposed a Distributional RL based route planner that can plan the shortest routes that minimize stochasticity in travel time.
+
+<p align="center">
+<img width="600" height="350" src="Town01_robust_rl_paths.png"> 
+</p>
+
 ## The Stochastic Road Network Environment
-The Stochastic Road Network Environment is built upon map structure and simulated sensor data originating from the CARLA autonomous vehicle simulator version 0.9.6. Five such maps are available by default, named in the sequencing of Town01 to Town05. The graph topology structure of Town01 and an example observation provided to the learning system are shown as follows. For detailed information about the Stochastic Road Network Environment, please refer to our paper [here](https://arxiv.org/abs/2304.09996).
 
-![image](https://github.com/RobustFieldAutonomyLab/Stochastic_Road_Network/blob/main/observation_revise.png)
+The Stochastic Road Network Environment is built upon map structure and simulated sensor data originating from CARLA version 0.9.6. Five such maps are available by default, named in the sequencing of Town01 to Town05. The graph topology structure of Town01 and an example observation provided to the learning system are shown as follows. For detailed information about the Stochastic Road Network Environment, please refer to our paper.
 
-## System Requirement
--  Ubuntu 20.04
+<p align="center">
+<img width="1000" height="380" src="observation.png"> 
+</p>
 
 ## Map Data Generation
+
 The map data needed to run experiments on Town01 to Town05 could be downloaded from [here](https://stevens0-my.sharepoint.com/:f:/g/personal/xlin26_stevens_edu/EioIeHjcj_xNnJJc7ziMAUMBmz6fLFFxblYV2JWNHvAcyQ?e=R1UAjR), or you could go through the following process to generate data with the provided scripts.
 
 1. Install [NVIDIA Container Runtime](https://nvidia.github.io/nvidia-container-runtime/)
@@ -44,10 +53,11 @@ sudo scripts/carla_docker.sh -oe
 python scripts/extract_maps.py
 ```
 
-## Run an Experiment
-Run the main experiment script:
+## Train Route Planning RL agents
+
+Our proposed planner uses QR-DQN, and we select A2C, PPO and DQN as the traditional RL baselines. We provide configuration files in config directory for training RL agents on different maps.
 ```
-$ python run_stable_baselines3.py -C [experiment config file (required)] -P [number of processes (optional)] -D [cuda device (optional)]
+$ python run_stable_baselines3.py -C [config file (required)] -P [number of processes (optional)] -D [cuda device (optional)]
 ```
 
 ## Experiment Parameterization
