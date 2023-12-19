@@ -6,6 +6,19 @@ This repository provides the codes of our UR 2023 paper [here](https://arxiv.org
 <img width="600" height="350" src="Town01_robust_rl_paths.png"> 
 </p>
 
+Please cite as:
+```
+@INPROCEEDINGS{10202222,
+  author={Lin, Xi and Szenher, Paul and Martin, John D. and Englot, Brendan},
+  booktitle={2023 20th International Conference on Ubiquitous Robots (UR)}, 
+  title={Robust Route Planning with Distributional Reinforcement Learning in a Stochastic Road Network Environment}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={287-294},
+  doi={10.1109/UR57808.2023.10202222}}
+```
+
 ## The Stochastic Road Network Environment
 
 The Stochastic Road Network Environment is built upon map structure and simulated sensor data originating from CARLA version 0.9.6. Five such maps are available by default, named in the sequencing of Town01 to Town05. The graph topology structure of Town01 and an example observation provided to the learning system are shown as follows. For detailed information about the Stochastic Road Network Environment, please refer to our paper.
