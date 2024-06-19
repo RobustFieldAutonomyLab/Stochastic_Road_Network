@@ -6,7 +6,7 @@ This repository provides the codes of our UR 2023 paper [here](https://arxiv.org
 <img width="600" height="350" src="Town01_robust_rl_paths.png"> 
 </p>
 
-Please cite as:
+If you find this repository useful, please cite our paper
 ```
 @INPROCEEDINGS{10202222,
   author={Lin, Xi and Szenher, Paul and Martin, John D. and Englot, Brendan},
